@@ -1,37 +1,16 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import fs from 'fs/promises'
-import mime from 'mime-types'
-import { serveStatic } from "hono/serve-static";
+export * from './inertia.js'
+export * from './types.js'
+export * from './html.js'
 
-const app = new Hono()
+// Main Hono middleware export
+export { inertiaHonoAdapter } from './inertia.js'
 
-// Serve static files
-app.use('/*', serveStatic({
-  root: './public',
-  getContent: async (path, c) => {
-    try {
-      const data = await fs.readFile(path);
-      let contentType = mime.contentType(path) ?? "text/plain";
+// Re-export commonly used types and utilities
+export type { Page } from './types.js'
+export type { HtmlTemplateOptions } from './html.js'
+export { Headers, Inertia, InertiaResponse, InertiaResponseFactory } from './inertia.js'
 
-      return new Response(data, {
-        headers: {
-          "Content-Type": contentType.toString(),
-        },
-      });
-    } catch (error) {
-      return null;
-    }
-  },
-}))
+// Hono module augmentation
+declare module 'hono' {
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
-
-serve({
-  fetch: app.fetch,
-  port: 3000
-}, (info) => {
-  console.log(`Server is running on http://localhost:${info.port}`)
-})
+}

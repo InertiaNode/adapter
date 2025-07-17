@@ -1,5 +1,5 @@
 {
-  "name": "inertia-hono",
+  "name": "@InertiaHono/inertia-hono",
   "type": "module",
   "scripts": {
     "dev": "tsx watch --inspect src/index.ts",
