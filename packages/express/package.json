@@ -1,0 +1,28 @@
+{
+    "name": "@inertianode/express",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "import": "./src/index.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@inertianode/core": "file:../core",
+        "express": "^5.1.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.3",
+        "typescript": "^5.8.3"
+    },
+    "peerDependencies": {
+        "express": "^5.1.0"
+    }
+}
