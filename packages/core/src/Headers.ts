@@ -1,4 +1,4 @@
-export const Headers = {
+export const Headers = Object.freeze({
     INERTIA: 'X-Inertia',
     ERROR_BAG: 'X-Inertia-Error-Bag',
     LOCATION: 'X-Inertia-Location',
@@ -7,4 +7,4 @@ export const Headers = {
     PARTIAL_ONLY: 'X-Inertia-Partial-Data',
     PARTIAL_EXCEPT: 'X-Inertia-Partial-Except',
     RESET: 'X-Inertia-Reset',
-} as const
+})
