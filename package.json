@@ -1,18 +1,19 @@
 {
-  "name": "@InertiaHono/inertia-hono",
+  "name": "@inertianode/adapter",
   "type": "module",
   "scripts": {
     "dev": "tsx watch --inspect src/index.ts",
-    "build": "tsc",
+    "build": "tsc && pnpm -r build",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm -r test:watch",
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.1",
-    "hono": "^4.7.8",
-    "mime-types": "^3.0.1"
+    "@inertianode/core": "workspace:*",
+    "@inertianode/hono": "workspace:*",
+    "@inertianode/express": "workspace:*"
   },
   "devDependencies": {
-    "@types/mime-types": "^2.1.4",
     "@types/node": "^20.11.17",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"

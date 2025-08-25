@@ -26,3 +26,11 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+example*
+vendor
+InertiaCore
+package-lock.json
+pnpm-lock.yaml
+dist
+*.tsbuildinfo

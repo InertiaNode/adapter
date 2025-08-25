@@ -15,7 +15,7 @@
         "build": "tsc"
     },
     "dependencies": {
-        "@inertianode/core": "file:../core",
+        "@inertianode/core": "workspace:^",
         "express": "^5.1.0"
     },
     "devDependencies": {
