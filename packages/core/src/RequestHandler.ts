@@ -47,14 +47,11 @@ export function handleVersionChange(url: string): Response {
 }
 
 /**
- * Handle empty responses by redirecting back to previous page or home
+ * Handle empty responses by returning Inertia location response
  */
 export function handleEmptyResponse(referer?: string): Response {
     const location = referer || '/';
-    return new Response('', {
-        status: 302,
-        headers: { 'Location': location },
-    });
+    return Inertia.location(location);
 }
 
 /**
