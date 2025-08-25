@@ -16,15 +16,16 @@ export function setupInertiaMiddleware(
         buildDirectory: 'build',
         manifestFilename: 'manifest.json',
         publicDirectory: 'public',
+        entrypoints: ['client/App.tsx'],
     };
 
     Inertia.setViteOptions(viteOptions);
 
-    // Set version - use automatic detection if not provided
+    // Set version - use automatic detection if not provided and no version is already set
     if (options.version) {
         Inertia.setVersion(options.version);
-    } else {
-        // Use automatic version detection based on Vite options
+    } else if (Inertia.getVersion() === undefined) {
+        // Only use automatic version detection if no version is already set
         const versionDetector = VersionDetector.createVersionDetector(
             viteOptions.publicDirectory,
             {

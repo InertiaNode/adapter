@@ -19,6 +19,7 @@ export type ViteOptions = {
   buildDirectory: string
   manifestFilename: string
   publicDirectory: string
+  entrypoints?: string[]
 }
 
 export interface InertiaMiddlewareOptions {
