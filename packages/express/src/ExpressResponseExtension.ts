@@ -4,21 +4,32 @@ import { Inertia, Headers, handleVersionChange, handleEmptyResponse, shouldChang
 
 // Helper function to convert Express request to web Request
 function expressRequestToWebRequest(req: ExpressRequest): Request {
-    const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    const protocol = req.protocol || 'http';
+    const host = (req.get && req.get('host')) || 'localhost';
+    const url = `${protocol}://${host}${req.originalUrl || req.url || '/'}`;
     const headers = new globalThis.Headers();
 
     // Copy headers from Express request to web Request headers
-    Object.entries(req.headers).forEach(([key, value]: [string, any]) => {
-        if (value !== undefined) {
-            headers.set(key, Array.isArray(value) ? value.join(', ') : value);
-        }
-    });
+    if (req.headers && typeof req.headers === 'object') {
+        Object.entries(req.headers).forEach(([key, value]: [string, any]) => {
+            if (value !== undefined) {
+                headers.set(key, Array.isArray(value) ? value.join(', ') : value);
+            }
+        });
+    }
 
-    return new Request(url, {
+    // GET and HEAD requests cannot have a body
+    const requestInit: RequestInit = {
         method: req.method,
         headers,
-        body: req.body,
-    });
+    };
+
+    // Only add body for methods that support it
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+        requestInit.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    }
+
+    return new Request(url, requestInit);
 }
 
 // Helper function to convert web Response headers to Express headers
@@ -42,13 +53,6 @@ export class ExpressInertiaResponse {
      * Send the Inertia response to an Express response object
      */
     async toResponse(res: ExpressResponse): Promise<void> {
-        // Handle Inertia-specific logic before sending the response
-        const didSend = await this.handleInertiaLogic(res);
-
-        if (didSend) {
-            return;
-        }
-
         const webRequest = expressRequestToWebRequest(this.expressRequest);
         const webResponse = await this.inertiaResponse.toResponse(webRequest);
 
@@ -58,16 +62,26 @@ export class ExpressInertiaResponse {
         // Get the response body as text
         const responseText = await webResponse.text();
 
+        // Set the status
+        res.status(webResponse.status);
+
+        // Handle Inertia-specific logic after we have the response ready
+        const didSend = await this.handleInertiaLogic(res, responseText);
+
+        if (didSend) {
+            return;
+        }
+
         // Send the response
-        res.status(webResponse.status).send(responseText);
+        res.send(responseText);
     }
 
     /**
      * Handle Inertia-specific logic for the response
      */
-    private async handleInertiaLogic(res: ExpressResponse): Promise<boolean> {
+    private async handleInertiaLogic(res: ExpressResponse, responseContent?: string): Promise<boolean> {
         // Only process Inertia-specific logic for Inertia requests
-        if (!this.expressRequest.get(Headers.INERTIA)) {
+        if (!(this.expressRequest.get && this.expressRequest.get(Headers.INERTIA))) {
             return false;
         }
 
@@ -76,13 +90,13 @@ export class ExpressInertiaResponse {
 
         // Handle version changes
         if (this.expressRequest.method === 'GET' &&
-            this.expressRequest.get(Headers.VERSION) !== Inertia.getVersion() && (this.expressRequest.get(Headers.VERSION) || Inertia.getVersion())) {
+            this.expressRequest.get && this.expressRequest.get(Headers.VERSION) !== Inertia.getVersion() && (this.expressRequest.get(Headers.VERSION) || Inertia.getVersion())) {
             await this.handleVersionChange(res);
             return true;
         }
 
-        // Handle empty responses
-        if (res.statusCode === 200 && !res.get('Content-Length')) {
+        // Handle empty responses - only redirect if we truly have no content
+        if (res.statusCode === 200 && (!responseContent || responseContent.length === 0)) {
             await this.handleEmptyResponse(res);
             return true;
         }
@@ -90,7 +104,7 @@ export class ExpressInertiaResponse {
         // Handle redirects for PUT/PATCH/DELETE requests
         if (shouldChangeRedirectStatus(this.expressRequest.method, res.statusCode)) {
             res.status(303);
-            return true;
+            return false; // Return false to let the response continue sending
         }
 
         return false;
@@ -102,12 +116,14 @@ export class ExpressInertiaResponse {
     private async handleVersionChange(res: ExpressResponse): Promise<void> {
         const locationResponse = handleVersionChange(this.expressRequest.url);
 
-        // Set the headers from the Inertia response
-        locationResponse.headers.forEach((value: string, key: string) => {
-            res.setHeader(key, value);
-        });
+        // Set the headers from the Inertia response if it exists
+        if (locationResponse && locationResponse.headers) {
+            locationResponse.headers.forEach((value: string, key: string) => {
+                res.setHeader(key, value);
+            });
+        }
 
-        res.status(locationResponse.status).end();
+        res.status(locationResponse?.status || 409).end();
     }
 
     /**
@@ -115,7 +131,7 @@ export class ExpressInertiaResponse {
      */
     private async handleEmptyResponse(res: ExpressResponse): Promise<void> {
         // Redirect back to previous page
-        const referer = this.expressRequest.get('Referer');
+        const referer = this.expressRequest.get && this.expressRequest.get('Referer');
         if (referer) {
             res.redirect(302, referer);
         } else {
@@ -156,7 +172,11 @@ export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse)
          * Share data with all Inertia requests
          */
         share(key: string | Record<string, any>, value?: any): void {
-            Inertia.share(key, value);
+            if (typeof key === 'object') {
+                Inertia.share(key);
+            } else {
+                Inertia.share(key, value);
+            }
         },
 
         /**
@@ -192,11 +212,14 @@ export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse)
          */
         location(url: string): void {
             const locationResponse = Inertia.location(url);
-            // Set the headers from the Inertia response
-            locationResponse.headers.forEach((value: string, key: string) => {
-                // This would need to be called on the actual response object
-                // For now, we'll handle this differently
-            });
+            // Set the headers from the Inertia response if it exists
+            if (locationResponse && locationResponse.headers) {
+                locationResponse.headers.forEach((value: string, key: string) => {
+                    res.setHeader(key, value);
+                });
+                // Set status from the response
+                res.status(locationResponse.status || 409);
+            }
         }
     };
 }

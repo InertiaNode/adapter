@@ -4,7 +4,7 @@ import { setupInertiaMiddleware } from '@inertianode/core';
 import { createInertiaProperty } from './ExpressResponseExtension.js';
 
 export function inertiaExpressAdapter(options: InertiaMiddlewareOptions = {}) {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction) => {
         // Add Inertia property to response object
         (res as any).Inertia = createInertiaProperty(req, res);
 
@@ -12,7 +12,7 @@ export function inertiaExpressAdapter(options: InertiaMiddlewareOptions = {}) {
         setupInertiaMiddleware(options, () => resolveValidationErrors(req));
 
         // Continue to next middleware
-        await next();
+        next();
     };
 }
 
