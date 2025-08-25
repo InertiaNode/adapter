@@ -44,13 +44,13 @@ export function inertiaHonoAdapter(options: InertiaMiddlewareOptions = {}) {
       const originalText = c.text.bind(c)
       
       // Override c.text to intercept empty responses
-      c.text = (text: string, init?: ResponseInit) => {
+      ;(c as any).text = (text: string, ...args: any[]) => {
         if (text === '') {
           // This is an empty response, return 409 for Inertia requests
           const emptyResponse = handleEmptyResponse(c.req.header('Referer'))
           return emptyResponse
         }
-        return originalText(text, init)
+        return originalText(text, ...args)
       }
     }
     
@@ -58,11 +58,12 @@ export function inertiaHonoAdapter(options: InertiaMiddlewareOptions = {}) {
       const originalRedirect = c.redirect.bind(c)
       
       // Override c.redirect to change status for PUT/PATCH/DELETE
-      c.redirect = (location: string, status?: number) => {
+      ;(c as any).redirect = (location: string | URL, status?: number) => {
+        const locationStr = typeof location === 'string' ? location : location.toString()
         if (shouldChangeRedirectStatus(c.req.method, status || 302)) {
-          return originalRedirect(location, 303)
+          return originalRedirect(locationStr as any, 303 as any)
         }
-        return originalRedirect(location, status)
+        return originalRedirect(location as any, status as any)
       }
     }
 

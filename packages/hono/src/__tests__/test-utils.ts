@@ -1,4 +1,5 @@
 import type { Context } from 'hono'
+import { vi } from 'vitest'
 
 export function createMockContext(overrides: Partial<Context> = {}): Context {
     const defaultContext = {
