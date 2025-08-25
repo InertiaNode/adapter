@@ -12,14 +12,22 @@
         }
     },
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "test:coverage": "vitest run --coverage"
     },
     "dependencies": {
         "@inertianode/core": "workspace:^",
         "hono": "^4.8.5"
     },
+    "publishConfig": {
+        "access": "public"
+    },
     "devDependencies": {
-        "typescript": "^5.8.3"
+        "typescript": "^5.8.3",
+        "vitest": "^3.0.0",
+        "@vitest/coverage-v8": "^3.0.0"
     },
     "peerDependencies": {
         "hono": "^4.8.5"
