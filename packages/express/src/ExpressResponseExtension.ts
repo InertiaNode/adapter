@@ -88,9 +88,11 @@ export class ExpressInertiaResponse {
         // Set Vary header
         res.setHeader('Vary', Headers.INERTIA);
 
-        // Handle version changes
-        if (this.expressRequest.method === 'GET' &&
-            this.expressRequest.get && this.expressRequest.get(Headers.VERSION) !== Inertia.getVersion() && (this.expressRequest.get(Headers.VERSION) || Inertia.getVersion())) {
+        // Handle version changes - only if both client and server have versions
+        const clientVersion = this.expressRequest.get && this.expressRequest.get(Headers.VERSION);
+        const serverVersion = Inertia.getVersion();
+        
+        if (this.expressRequest.method === 'GET' && clientVersion && serverVersion && clientVersion !== serverVersion) {
             await this.handleVersionChange(res);
             return true;
         }
