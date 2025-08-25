@@ -30,7 +30,7 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
     const isDevelopment = fs.existsSync(hotFilePath)
 
     // Load manifest for production assets
-    const manifestPath = path.join(process.cwd(), finalViteOptions.publicDirectory, finalViteOptions.manifestFilename)
+    const manifestPath = path.join(process.cwd(), finalViteOptions.publicDirectory, finalViteOptions.buildDirectory, finalViteOptions.manifestFilename)
     const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, 'utf8')) : null
 
     // Generate asset tags
