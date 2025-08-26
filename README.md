@@ -26,13 +26,13 @@ npm install inertianode/adapter
 #### For Hono projects:
 
 ```bash
-npm install @inertianode/core @inertianode/hono
+npm install @inertianode/hono
 ```
 
 #### For Express projects:
 
 ```bash
-npm install @inertianode/core @inertianode/express
+npm install @inertianode/express
 ```
 
 #### For custom adapters:
