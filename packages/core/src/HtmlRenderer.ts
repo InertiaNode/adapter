@@ -6,7 +6,7 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
     const {
         title = 'Inertia',
         dev = false,
-        hotUrl = 'http://localhost:5173',
+        hotUrl = null,
         head = '',
         body = ''
     } = options
@@ -29,6 +29,7 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
     // Check if we're in development mode (hot file exists)
     const hotFilePath = path.join(process.cwd(), finalViteOptions.publicDirectory, finalViteOptions.hotFile)
     const isDevelopment = fs.existsSync(hotFilePath)
+    const hotFile = isDevelopment ? fs.readFileSync(hotFilePath, 'utf8').trim() : null;
 
     // Load manifest for production assets
     const manifestPath = path.join(process.cwd(), finalViteOptions.publicDirectory, finalViteOptions.buildDirectory, finalViteOptions.manifestFilename)
@@ -37,8 +38,10 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
     // Detect if React is being used
     const isReactApp = detectReactUsage(finalViteOptions, manifest)
 
+    const computedHotUrl = hotUrl ?? hotFile ?? 'http://localhost:5173';
+
     // Generate asset tags
-    const assetTags = generateAssetTags(isDevelopment, hotUrl, manifest, finalViteOptions, isReactApp)
+    const assetTags = generateAssetTags(isDevelopment, computedHotUrl, manifest, finalViteOptions, isReactApp)
 
     return `<!DOCTYPE html>
 <html lang="en">
