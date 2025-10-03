@@ -1,4 +1,4 @@
-import type { InertiaMiddlewareOptions } from './types.js';
+import type { InertiaMiddlewareOptions, ViteOptions } from './types.js';
 import { Inertia } from './Inertia.js';
 import { VersionDetector } from './VersionDetector.js';
 
@@ -11,12 +11,13 @@ export function setupInertiaMiddleware(
     resolveErrors: () => Record<string, any>
 ): void {
     // Set Vite options first (needed for version detection)
-    const viteOptions = options.vite || {
+    const viteOptions: ViteOptions = {
         hotFile: 'hot',
         buildDirectory: 'build',
         manifestFilename: 'manifest.json',
         publicDirectory: 'public',
         entrypoints: ['client/App.tsx'],
+        ...options.vite,
     };
 
     Inertia.setViteOptions(viteOptions);
@@ -28,11 +29,7 @@ export function setupInertiaMiddleware(
         // Only use automatic version detection if no version is already set
         const versionDetector = VersionDetector.createVersionDetector(
             viteOptions.publicDirectory,
-            {
-                hotFile: viteOptions.hotFile,
-                buildDirectory: viteOptions.buildDirectory,
-                manifestFilename: viteOptions.manifestFilename,
-            }
+            viteOptions,
         );
         Inertia.setVersion(versionDetector);
     }
