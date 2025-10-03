@@ -14,7 +14,7 @@ export class InertiaResponse {
     private viewData: Record<string, any> = {}
     private renderer: ((page: Page, viewData: any) => string | Promise<string>) | null = null
     private cacheFor: (number | string)[] = []
-    private viteOptions: ViteOptions | null = null
+    private viteOptions: Partial<ViteOptions> = {}
 
     constructor(
         component: string,
@@ -24,7 +24,7 @@ export class InertiaResponse {
         encryptHistory = false,
         urlResolver: ((url: string) => string) | null = null,
         renderer?: ((page: Page, viewData: any) => string | Promise<string>) | null,
-        viteOptions?: ViteOptions | null,
+        viteOptions: Partial<ViteOptions> = {},
     ) {
         this.component = component
         this.props = props
@@ -34,7 +34,10 @@ export class InertiaResponse {
         this.encryptHistory = encryptHistory
         this.urlResolver = urlResolver
         this.renderer = renderer || null
-        this.viteOptions = viteOptions || null
+        this.viteOptions = {
+            ...this.viteOptions,
+            ...(viteOptions || {}),
+        };
     }
 
     with(key: string | Record<string, any>, value?: any): this {

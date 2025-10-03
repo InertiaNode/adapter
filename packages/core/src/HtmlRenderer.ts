@@ -2,7 +2,7 @@ import type { HtmlTemplateOptions, Page, ViteOptions } from './types.js'
 import fs from 'fs';
 import path from 'path';
 
-export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}, viteOptions?: ViteOptions | null): string {
+export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}, viteOptions?: Partial<ViteOptions> | null): string {
     const {
         title = 'Inertia',
         dev = false,
@@ -24,7 +24,10 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
         entrypoints: ['client/App.tsx']
     }
 
-    const finalViteOptions = viteOptions || defaultViteOptions
+    const finalViteOptions = {
+        ...defaultViteOptions,
+        ...(viteOptions || {}),
+    };
 
     // Check if we're in development mode (hot file exists)
     const hotFilePath = path.join(process.cwd(), finalViteOptions.publicDirectory, finalViteOptions.hotFile)

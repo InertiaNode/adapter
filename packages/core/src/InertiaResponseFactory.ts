@@ -10,15 +10,18 @@ export class InertiaResponseFactory {
     private shouldClearHistory = false
     private shouldEncryptHistory = false
     private urlResolver: ((url: string) => string) | null = null
-    private viteOptions: ViteOptions | null = null
+    private viteOptions: Partial<ViteOptions> = {}
     private renderer?: (page: Page, viewData: any) => string | Promise<string>
 
     setRootView(name: string): void {
         this.rootView = name
     }
 
-    setViteOptions(options: ViteOptions): void {
-        this.viteOptions = options
+    setViteOptions(options: Partial<ViteOptions>): void {
+        this.viteOptions = {
+            ...this.viteOptions,
+            ...(options || {}),
+        };
     }
 
     setRenderer(renderer: (page: Page, viewData: any) => string | Promise<string>): void {

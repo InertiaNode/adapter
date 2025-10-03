@@ -19,14 +19,14 @@ export type ViteOptions = {
   buildDirectory: string
   manifestFilename: string
   publicDirectory: string
-  entrypoints?: string[]
+  entrypoints: string[]
 }
 
 export interface InertiaMiddlewareOptions {
   version?: string | (() => string)
   flashMessages?: () => Record<string, any>
   html?: (page: Page, viewData: any) => string | Promise<string>
-  vite?: ViteOptions
+  vite?: Partial<ViteOptions>
 }
 
 export interface HtmlTemplateOptions {
