@@ -17,6 +17,10 @@
       "types": "./dist/express.d.ts",
       "import": "./dist/express.js"
     },
+    "./koa": {
+      "types": "./dist/koa.d.ts",
+      "import": "./dist/koa.js"
+    },
     "./core": {
       "types": "./dist/core.d.ts",
       "import": "./dist/core.js"
@@ -30,7 +34,8 @@
   "dependencies": {
     "@inertianode/core": "workspace:*",
     "@inertianode/hono": "workspace:*",
-    "@inertianode/express": "workspace:*"
+    "@inertianode/express": "workspace:*",
+    "@inertianode/koa": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
