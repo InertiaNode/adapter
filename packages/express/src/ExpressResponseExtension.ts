@@ -222,6 +222,14 @@ export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse)
                 // Set status from the response
                 res.status(locationResponse.status || 409);
             }
+        },
+
+        /**
+         * Redirect back to the previous page (referer) or to a fallback URL
+         */
+        back(fallbackUrl: string = '/'): void {
+            const referer = req.get && req.get('Referer');
+            res.redirect(303, referer || fallbackUrl);
         }
     };
 }

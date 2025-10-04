@@ -12,7 +12,7 @@ export function inertiaHonoAdapter(options: InertiaMiddlewareOptions = {}) {
 
     // Check if this is an Inertia request
     const isInertiaRequest = c.req.header(Headers.INERTIA)
-    
+
     // If not an Inertia request, continue normally
     if (!isInertiaRequest) {
       await next()
@@ -42,29 +42,29 @@ export function inertiaHonoAdapter(options: InertiaMiddlewareOptions = {}) {
     // Intercept the response by wrapping the context methods if they exist
     if (typeof c.text === 'function') {
       const originalText = c.text.bind(c)
-      
-      // Override c.text to intercept empty responses
-      ;(c as any).text = (text: string, ...args: any[]) => {
-        if (text === '') {
-          // This is an empty response, return 409 for Inertia requests
-          const emptyResponse = handleEmptyResponse(c.req.header('Referer'))
-          return emptyResponse
+
+        // Override c.text to intercept empty responses
+        ; (c as any).text = (text: string, ...args: any[]) => {
+          if (text === '') {
+            // This is an empty response, return 409 for Inertia requests
+            const emptyResponse = handleEmptyResponse(c.req.header('Referer'))
+            return emptyResponse
+          }
+          return originalText(text, ...args)
         }
-        return originalText(text, ...args)
-      }
     }
-    
+
     if (typeof c.redirect === 'function') {
       const originalRedirect = c.redirect.bind(c)
-      
-      // Override c.redirect to change status for PUT/PATCH/DELETE
-      ;(c as any).redirect = (location: string | URL, status?: number) => {
-        const locationStr = typeof location === 'string' ? location : location.toString()
-        if (shouldChangeRedirectStatus(c.req.method, status || 302)) {
-          return originalRedirect(locationStr as any, 303 as any)
+
+        // Override c.redirect to change status for PUT/PATCH/DELETE
+        ; (c as any).redirect = (location: string | URL, status?: number) => {
+          const locationStr = typeof location === 'string' ? location : location.toString()
+          if (shouldChangeRedirectStatus(c.req.method, status || 302)) {
+            return originalRedirect(locationStr as any, 303 as any)
+          }
+          return originalRedirect(location as any, status as any)
         }
-        return originalRedirect(location as any, status as any)
-      }
     }
 
     await next()

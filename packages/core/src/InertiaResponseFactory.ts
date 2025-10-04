@@ -94,6 +94,18 @@ export class InertiaResponseFactory {
         })
     }
 
+    back(fallbackUrl: string = '/'): Response {
+        // Returns a redirect response that instructs the client to go back
+        // This is typically handled by the framework-specific adapters
+        // which have access to the request headers to get the referer
+        return new Response('', {
+            status: 303,
+            headers: {
+                'Location': fallbackUrl,
+            },
+        })
+    }
+
     // Prop helper methods
     lazy(callback: PropCallback): LazyProp {
         return new LazyProp(callback)

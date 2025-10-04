@@ -224,6 +224,15 @@ export function createInertiaProperty(ctx: Context) {
                 // Set status from the response
                 ctx.status = locationResponse.status || 409;
             }
+        },
+
+        /**
+         * Redirect back to the previous page (referer) or to a fallback URL
+         */
+        back(fallbackUrl: string = '/'): void {
+            const referer = ctx.get('Referer');
+            ctx.status = 303;
+            ctx.redirect(referer || fallbackUrl);
         }
     };
 }
