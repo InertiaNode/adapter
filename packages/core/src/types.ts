@@ -47,6 +47,12 @@ export interface Mergeable {
   shouldMerge(): boolean
   shouldDeepMerge(): boolean
   matchesOn(): string[]
+  append(path?: boolean | string | string[], matchOn?: string): this
+  prepend(path?: boolean | string | string[], matchOn?: string): this
+  appendsAtRoot(): boolean
+  prependsAtRoot(): boolean
+  appendsAtPaths(): string[]
+  prependsAtPaths(): string[]
 }
 
 export interface PropCallback {

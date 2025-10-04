@@ -1,4 +1,4 @@
-import { LazyProp, DeferProp, MergeProp, AlwaysProp, OptionalProp } from './props/index.js'
+import { LazyProp, DeferProp, MergeProp, AlwaysProp, OptionalProp, ScrollProp } from './props/index.js'
 import type { PropCallback } from './types.js'
 
 /**
@@ -26,6 +26,14 @@ export function merge(value: any): MergeProp {
 }
 
 /**
+ * Create a deep merge prop that will be deeply merged with existing props on the client.
+ * This is a convenience wrapper around merge().deepMerge().
+ */
+export function deepMerge(value: any): MergeProp {
+    return new MergeProp(value).deepMerge()
+}
+
+/**
  * Create an always prop that will always be included, even in partial requests.
  */
 export function always(value: any): AlwaysProp {
@@ -38,4 +46,13 @@ export function always(value: any): AlwaysProp {
  */
 export function optional(callback: PropCallback): OptionalProp {
     return new OptionalProp(callback)
+}
+
+/**
+ * Create a scroll prop to control scroll behavior.
+ * @param wrapper - Optional wrapper element selector
+ * @param metadata - Optional metadata for scroll control
+ */
+export function scroll(wrapper?: string, metadata?: Record<string, any>): ScrollProp {
+    return new ScrollProp(wrapper, metadata)
 }

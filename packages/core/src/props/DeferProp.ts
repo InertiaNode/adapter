@@ -6,6 +6,9 @@ export class DeferProp implements IgnoreFirstLoad, Mergeable {
     private mergeFlag = false
     private deepMergeFlag = false
     private matchOnArray: string[] = []
+    private appendFlag = true
+    private appendsAtPathsArray: string[] = []
+    private prependsAtPathsArray: string[] = []
 
     constructor(callback: PropCallback, group: string | null = null) {
         this.callback = callback
@@ -35,6 +38,34 @@ export class DeferProp implements IgnoreFirstLoad, Mergeable {
         return this
     }
 
+    append(path: boolean | string | string[] = true, matchOn?: string): this {
+        if (typeof path === 'boolean') {
+            this.appendFlag = path
+        } else if (typeof path === 'string') {
+            this.appendsAtPathsArray.push(path)
+            if (matchOn) {
+                this.matchOnArray.push(`${path}.${matchOn}`)
+            }
+        } else if (Array.isArray(path)) {
+            path.forEach(p => this.append(p))
+        }
+        return this
+    }
+
+    prepend(path: boolean | string | string[] = true, matchOn?: string): this {
+        if (typeof path === 'boolean') {
+            this.appendFlag = !path
+        } else if (typeof path === 'string') {
+            this.prependsAtPathsArray.push(path)
+            if (matchOn) {
+                this.matchOnArray.push(`${path}.${matchOn}`)
+            }
+        } else if (Array.isArray(path)) {
+            path.forEach(p => this.prepend(p))
+        }
+        return this
+    }
+
     shouldMerge(): boolean {
         return this.mergeFlag
     }
@@ -45,5 +76,25 @@ export class DeferProp implements IgnoreFirstLoad, Mergeable {
 
     matchesOn(): string[] {
         return this.matchOnArray
+    }
+
+    appendsAtRoot(): boolean {
+        return this.appendFlag && this.mergesAtRoot()
+    }
+
+    prependsAtRoot(): boolean {
+        return !this.appendFlag && this.mergesAtRoot()
+    }
+
+    private mergesAtRoot(): boolean {
+        return this.appendsAtPathsArray.length === 0 && this.prependsAtPathsArray.length === 0
+    }
+
+    appendsAtPaths(): string[] {
+        return this.appendsAtPathsArray
+    }
+
+    prependsAtPaths(): string[] {
+        return this.prependsAtPathsArray
     }
 }

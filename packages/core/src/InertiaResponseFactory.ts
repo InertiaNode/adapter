@@ -107,6 +107,10 @@ export class InertiaResponseFactory {
         return new MergeProp(value)
     }
 
+    deepMerge(value: any): MergeProp {
+        return new MergeProp(value).deepMerge()
+    }
+
     always(value: any): AlwaysProp {
         return new AlwaysProp(value)
     }
