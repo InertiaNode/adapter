@@ -1,7 +1,7 @@
 import type { Page, ViteOptions, PropCallback } from './types.js'
 import { InertiaResponse } from './InertiaResponse.js'
 import { Headers } from './Headers.js'
-import { LazyProp, DeferProp, MergeProp, AlwaysProp, OptionalProp } from './props/index.js'
+import { LazyProp, DeferProp, MergeProp, AlwaysProp, OptionalProp, ScrollProp } from './props/index.js'
 
 export class InertiaResponseFactory {
     private rootView = 'app'
@@ -117,5 +117,9 @@ export class InertiaResponseFactory {
 
     optional(callback: PropCallback): OptionalProp {
         return new OptionalProp(callback)
+    }
+
+    scroll(wrapper?: string, metadata?: Record<string, any>): ScrollProp {
+        return new ScrollProp(wrapper, metadata)
     }
 }
