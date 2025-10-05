@@ -2,17 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { ViteOptions } from './types.js';
+import { Vite } from './Vite.js';
 
 export class VersionDetector {
     /**
      * Automatically detect the current asset version based on manifest files.
      * This follows the same logic as the Laravel Inertia implementation.
      */
-    static detectVersion(publicDirectory: string = 'public', viteOptions: ViteOptions): string | null {
-        VersionDetector
+    static detectVersion(publicDirectory: string = 'public', viteOptions?: Partial<ViteOptions>): string | null {
+        const options = { ...Vite.defaultOptions, ...(viteOptions || {}) };
 
         // Check if we're in development mode (hot file exists)
-        const hotFilePath = path.join(process.cwd(), publicDirectory, viteOptions.hotFile);
+        const hotFilePath = path.join(process.cwd(), publicDirectory, options.hotFile);
         const isDevelopment = fs.existsSync(hotFilePath);
 
         if (isDevelopment) {
@@ -30,7 +31,7 @@ export class VersionDetector {
 
         // Production mode - check manifest files
         // Check for Vite manifest first (most common)
-        const viteManifestPath = path.join(process.cwd(), publicDirectory, viteOptions.buildDirectory, viteOptions.manifestFilename);
+        const viteManifestPath = path.join(process.cwd(), publicDirectory, options.buildDirectory, options.manifestFilename);
         if (fs.existsSync(viteManifestPath)) {
             return this.hashFile(viteManifestPath);
         }
@@ -42,7 +43,7 @@ export class VersionDetector {
         }
 
         // Check for any manifest.json in the public directory
-        const manifestPath = path.join(process.cwd(), publicDirectory, viteOptions.manifestFilename);
+        const manifestPath = path.join(process.cwd(), publicDirectory, options.manifestFilename);
         if (fs.existsSync(manifestPath)) {
             return this.hashFile(manifestPath);
         }
@@ -75,7 +76,7 @@ export class VersionDetector {
     /**
      * Create a version detector function that can be used with Inertia.setVersion()
      */
-    static createVersionDetector(publicDirectory: string = 'public', viteOptions: ViteOptions): () => string {
+    static createVersionDetector(publicDirectory: string = 'public', viteOptions?: Partial<ViteOptions>): () => string {
         return () => {
             const version = this.detectVersion(publicDirectory, viteOptions);
             return version || '';
