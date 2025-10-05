@@ -27,11 +27,17 @@ export type ViteOptions = {
   entrypoints: string[]
 }
 
+export interface SsrOptions {
+  enabled: boolean
+  url?: string
+}
+
 export interface InertiaMiddlewareOptions {
   version?: string | (() => string)
   flashMessages?: () => Record<string, any>
   html?: (page: Page, viewData: any) => string | Promise<string>
   vite?: Partial<ViteOptions>
+  ssr?: SsrOptions
 }
 
 export interface HtmlTemplateOptions {

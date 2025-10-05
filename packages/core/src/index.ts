@@ -8,6 +8,7 @@ export * from './InertiaResponseFactory.js';
 export * from './PropHelpers.js';
 export * from './VersionDetector.js';
 export * from './Vite.js';
+export * from './SsrGateway.js';
 export * from './props/index.js';
 export * from './MiddlewareSetup.js';
 export * from './RequestHandler.js';

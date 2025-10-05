@@ -41,4 +41,9 @@ export function setupInertiaMiddleware(
 
     // Set root view
     Inertia.setRootView('app');
+
+    // Set SSR options if provided
+    if (options.ssr) {
+        Inertia.setSsrOptions(options.ssr);
+    }
 }

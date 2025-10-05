@@ -98,7 +98,7 @@ export function inertiaHead(ssrHead?: string[] | string | null): string {
  * Render the Inertia app mount point
  * Includes the div with data-page attribute containing the serialized page data
  * @param page - The Inertia page object
- * @param ssrBody - Optional SSR body content (pre-rendered HTML)
+ * @param ssrBody - Optional SSR body content (pre-rendered HTML from SSR server)
  * @param appId - The ID for the app div (default: 'app')
  * @returns HTML string with the app div (or SSR body if provided)
  */

@@ -1,7 +1,8 @@
-import type { Page, HtmlTemplateOptions, IgnoreFirstLoad, Mergeable, ViteOptions } from './types.js'
+import type { Page, HtmlTemplateOptions, IgnoreFirstLoad, Mergeable, ViteOptions, SsrOptions } from './types.js'
 import { LazyProp, DeferProp, MergeProp, AlwaysProp, OptionalProp } from './props/index.js'
 import { renderHtmlTemplate } from './HtmlRenderer.js'
 import { Headers } from './Headers.js'
+import { SsrGateway } from './SsrGateway.js'
 
 export class InertiaResponse {
     private component: string
@@ -15,6 +16,7 @@ export class InertiaResponse {
     private renderer: ((page: Page, viewData: any) => string | Promise<string>) | null = null
     private cacheFor: (number | string)[] = []
     private viteOptions: Partial<ViteOptions> = {}
+    private ssrOptions?: SsrOptions
 
     constructor(
         component: string,
@@ -25,6 +27,7 @@ export class InertiaResponse {
         urlResolver: ((url: string) => string) | null = null,
         renderer?: ((page: Page, viewData: any) => string | Promise<string>) | null,
         viteOptions: Partial<ViteOptions> = {},
+        ssrOptions?: SsrOptions,
     ) {
         this.component = component
         this.props = props
@@ -38,6 +41,7 @@ export class InertiaResponse {
             ...this.viteOptions,
             ...(viteOptions || {}),
         };
+        this.ssrOptions = ssrOptions
     }
 
     with(key: string | Record<string, any>, value?: any): this {
@@ -363,9 +367,26 @@ export class InertiaResponse {
             htmlOptions = {}
         }
 
-        // Let the HtmlRenderer determine dev mode based on hot file existence
-        // The HtmlRenderer will check for the hot file and use ViteOptions if provided
+        // Try SSR if enabled
+        let ssrResponse = null
+        if (this.ssrOptions?.enabled) {
+            ssrResponse = await SsrGateway.dispatch(page, this.ssrOptions)
+        }
 
+        // If we have SSR response and a custom renderer, pass the SSR data via viewData
+        if (ssrResponse && this.renderer) {
+            const viewDataWithSsr = {
+                ...this.viewData,
+                ssr: ssrResponse
+            }
+            const html = await this.renderer(page, viewDataWithSsr)
+            return new Response(html, {
+                status: 200,
+                headers: {
+                    'Content-Type': 'text/html',
+                },
+            })
+        }
 
         // Return HTML response for non-Inertia requests
         const html = this.renderer ? await this.renderer(page, this.viewData) : renderHtmlTemplate(page, htmlOptions, this.viteOptions)

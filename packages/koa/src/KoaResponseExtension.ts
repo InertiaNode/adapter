@@ -185,6 +185,10 @@ export function createInertiaProperty(ctx: Context) {
 
     if ((Inertia as any).urlResolver) {
         inertiaInstance.resolveUrlUsing((Inertia as any).urlResolver);
+
+    }
+    if ((Inertia as any).ssrOptions) {
+        inertiaInstance.setSsrOptions((Inertia as any).ssrOptions);
     }
 
     return {

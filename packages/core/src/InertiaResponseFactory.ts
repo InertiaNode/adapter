@@ -1,4 +1,4 @@
-import type { Page, ViteOptions, PropCallback } from './types.js'
+import type { Page, ViteOptions, PropCallback, SsrOptions } from './types.js'
 import { InertiaResponse } from './InertiaResponse.js'
 import { Headers } from './Headers.js'
 import { LazyProp, DeferProp, MergeProp, AlwaysProp, OptionalProp, ScrollProp } from './props/index.js'
@@ -12,6 +12,7 @@ export class InertiaResponseFactory {
     private urlResolver: ((url: string) => string) | null = null
     private viteOptions: Partial<ViteOptions> = {}
     private renderer?: (page: Page, viewData: any) => string | Promise<string>
+    private ssrOptions?: SsrOptions
 
     setRootView(name: string): void {
         this.rootView = name
@@ -26,6 +27,10 @@ export class InertiaResponseFactory {
 
     setRenderer(renderer: (page: Page, viewData: any) => string | Promise<string>): void {
         this.renderer = renderer
+    }
+
+    setSsrOptions(options: SsrOptions): void {
+        this.ssrOptions = options
     }
 
     share(key: string | Record<string, any>, value?: any): void {
@@ -82,6 +87,7 @@ export class InertiaResponseFactory {
             this.urlResolver,
             this.renderer,
             this.viteOptions,
+            this.ssrOptions,
         )
     }
 
