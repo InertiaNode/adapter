@@ -39,8 +39,10 @@ export function setupInertiaMiddleware(
         errors: resolveErrors(),
     });
 
-    // Set root view
-    Inertia.setRootView('app');
+    // Set HTML renderer if provided
+    if (options.html) {
+        Inertia.setRenderer(options.html);
+    }
 
     // Set SSR options if provided
     if (options.ssr) {
