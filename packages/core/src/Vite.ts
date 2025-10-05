@@ -15,7 +15,8 @@ export class Vite {
         buildDirectory: 'build',
         manifestFilename: 'manifest.json',
         publicDirectory: 'public',
-        entrypoints: ['client/App.tsx']
+        entrypoints: ['client/App.tsx'],
+        reactRefresh: false
     };
 
     private static manifestCache: Record<string, any> | null = null;
@@ -85,14 +86,14 @@ export class Vite {
         const isDev = this.isRunningHot(options);
         const hot = this.hotUrl(options) || 'http://localhost:5173';
         const manifest = this.manifest(options);
-        const isReact = this.detectReactUsage(opts, manifest);
 
-        return this.generateAssetTags(isDev, hot, manifest, { ...opts, entrypoints: entrypointArray }, isReact);
+        return this.generateAssetTags(isDev, hot, manifest, { ...opts, entrypoints: entrypointArray });
     }
 
     /**
      * Generate React Fast Refresh script tag for development
-     * Only needed if you want to manually add React refresh without using makeTag()
+     * Use this if you want to manually add React refresh to your template
+     * Alternatively, set reactRefresh: true in Vite options to include it automatically
      */
     static reactRefresh(options?: Partial<ViteOptions>): string {
         const hot = this.hotUrl(options) || 'http://localhost:5173';
@@ -108,61 +109,13 @@ export class Vite {
     }
 
     /**
-     * Detect if React is being used in the project
-     */
-    private static detectReactUsage(viteOptions: ViteOptions, manifest: any): boolean {
-        // Check if any entrypoints suggest React usage
-        const entrypoints = viteOptions.entrypoints || ['client/App.tsx'];
-
-        const hasReactEntrypoint = entrypoints.some(entry =>
-            entry.includes('.tsx') || entry.includes('.jsx')
-        );
-
-        if (hasReactEntrypoint) {
-            return true;
-        }
-
-        // In production, check manifest for React-related files
-        if (manifest) {
-            for (const [, asset] of Object.entries(manifest)) {
-                if (typeof asset === 'object' && asset !== null && 'file' in asset) {
-                    const fileName = asset.file as string;
-                    if (fileName.includes('react') || fileName.includes('jsx') || fileName.includes('tsx')) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // Check if React is in package.json dependencies
-        try {
-            const packageJsonPath = path.join(process.cwd(), 'package.json');
-            if (fs.existsSync(packageJsonPath)) {
-                const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-                const allDeps = {
-                    ...packageJson.dependencies,
-                    ...packageJson.devDependencies,
-                    ...packageJson.peerDependencies
-                };
-
-                return !!(allDeps.react || allDeps['@types/react'] || allDeps['react-dom']);
-            }
-        } catch (error) {
-            // Ignore errors reading package.json
-        }
-
-        return false;
-    }
-
-    /**
      * Generate asset tags for development or production
      */
     private static generateAssetTags(
         isDevelopment: boolean,
         hotUrl: string,
         manifest: any,
-        viteOptions: ViteOptions,
-        isReactApp: boolean
+        viteOptions: ViteOptions
     ): string {
         if (isDevelopment) {
             // Development mode - use Vite dev server
@@ -172,8 +125,8 @@ export class Vite {
     <!-- Development mode scripts -->
     <script type="module" src="${hotUrl}/@vite/client"></script>`;
 
-            // Add React refresh only if React is detected
-            if (isReactApp) {
+            // Add React refresh only if explicitly enabled
+            if (viteOptions.reactRefresh) {
                 devScripts += `
     <script type="module">
         import RefreshRuntime from '${hotUrl}/@react-refresh'

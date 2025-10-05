@@ -36,23 +36,24 @@ export function viteAssets(entrypoints: string | string[], viteOptions?: Partial
 }
 
 /**
- * Legacy renderHtmlTemplate function for backwards compatibility
+ * Default HTML template renderer with Vite asset support
+ * This is a fallback renderer when no custom renderer is provided
+ * To enable React Fast Refresh, set reactRefresh: true in Vite options
  */
 export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}, viteOptions?: Partial<ViteOptions> | null): string {
     const {
         title = 'Inertia',
-        dev = false,
-        hotUrl = null,
         head = '',
         body = ''
     } = options
 
+    // Generate asset tags using the Vite class
+    const assetTags = Vite.makeTag(viteOptions?.entrypoints || ['src/app.tsx'], viteOptions || undefined);
+
+    // Serialize page data with proper escaping
     const pageData = JSON.stringify(page)
         .replaceAll(/</g, '\\u003c')
         .replaceAll(/"/g, '&quot;')
-
-    // Generate asset tags using the Vite class
-    const assetTags = Vite.makeTag(viteOptions?.entrypoints || ['client/App.tsx'], viteOptions || undefined);
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -61,15 +62,11 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${title}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-
     ${assetTags}
 
     ${head}
 </head>
-<body class="font-sans antialiased">
+<body>
     <div id="app" data-page='${pageData}'></div>
     ${body}
 </body>

@@ -25,6 +25,7 @@ export type ViteOptions = {
   manifestFilename: string
   publicDirectory: string
   entrypoints: string[]
+  reactRefresh?: boolean
 }
 
 export interface SsrOptions {
