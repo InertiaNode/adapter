@@ -21,6 +21,10 @@
       "types": "./dist/koa.d.ts",
       "import": "./dist/koa.js"
     },
+    "./nestjs": {
+      "types": "./dist/nestjs.d.ts",
+      "import": "./dist/nestjs.js"
+    },
     "./core": {
       "types": "./dist/core.d.ts",
       "import": "./dist/core.js"
@@ -35,7 +39,8 @@
     "@inertianode/core": "workspace:*",
     "@inertianode/hono": "workspace:*",
     "@inertianode/express": "workspace:*",
-    "@inertianode/koa": "workspace:*"
+    "@inertianode/koa": "workspace:*",
+    "@inertianode/nestjs": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
