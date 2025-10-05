@@ -164,8 +164,9 @@ export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse)
     const inertiaInstance = new InertiaResponseFactory();
 
     // Copy global configuration to the per-request instance
-    if (Inertia.getVersion()) {
-        inertiaInstance.setVersion(Inertia.getVersion());
+    const version = Inertia.getVersion();
+    if (version) {
+        inertiaInstance.setVersion(version);
     }
 
     // Copy other global settings

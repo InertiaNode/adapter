@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import type { InertiaResponse } from '@inertianode/core';
-import { InertiaResponseFactory, Headers, handleVersionChange, handleEmptyResponse, shouldChangeRedirectStatus } from '@inertianode/core';
+import { InertiaResponseFactory, Inertia, Headers, handleVersionChange, handleEmptyResponse, shouldChangeRedirectStatus } from '@inertianode/core';
 
 // Helper function to convert Hono context to web Request
 function honoContextToWebRequest(c: Context): Request {
@@ -139,8 +139,9 @@ export function createInertiaProperty(c: Context) {
     const inertiaInstance = new InertiaResponseFactory();
 
     // Copy global configuration to the per-request instance
-    if (Inertia.getVersion()) {
-        inertiaInstance.setVersion(Inertia.getVersion());
+    const version = Inertia.getVersion();
+    if (version) {
+        inertiaInstance.setVersion(version);
     }
 
     // Copy other global settings

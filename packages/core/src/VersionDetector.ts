@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { ViteOptions } from './types.js';
+import type { ViteOptions } from './types.js';
 import { Vite } from './Vite.js';
 
 export class VersionDetector {
