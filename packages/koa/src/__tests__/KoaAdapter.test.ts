@@ -5,7 +5,55 @@ import { setupInertiaMiddleware } from '@inertianode/core'
 
 // Mock the core module
 vi.mock('@inertianode/core', () => ({
-    setupInertiaMiddleware: vi.fn()
+    setupInertiaMiddleware: vi.fn(),
+    InertiaResponseFactory: class MockInertiaResponseFactory {
+        render = vi.fn(() => ({
+            toResponse: vi.fn().mockResolvedValue(new Response('test response'))
+        }))
+        share = vi.fn()
+        setVersion = vi.fn()
+        getVersion = vi.fn()
+        setRootView = vi.fn()
+        setViteOptions = vi.fn()
+        setRenderer = vi.fn()
+        resolveUrlUsing = vi.fn()
+        setSsrOptions = vi.fn()
+        location = vi.fn(() => ({
+            status: 409,
+            headers: new globalThis.Headers({ 'X-Inertia-Location': '/redirect-url' }),
+            forEach: (fn: any) => {
+                fn('/redirect-url', 'X-Inertia-Location')
+            }
+        }))
+        clearHistory = vi.fn()
+        encryptHistory = vi.fn()
+    },
+    Inertia: {
+        render: vi.fn(),
+        share: vi.fn(),
+        setVersion: vi.fn(),
+        getVersion: vi.fn(),
+        setRootView: vi.fn(),
+        setViteOptions: vi.fn(),
+        location: vi.fn(() => new Response('', {
+            status: 409,
+            headers: { 'X-Inertia-Location': '/redirect-url' }
+        }))
+    },
+    Headers: {
+        INERTIA: 'X-Inertia',
+        VERSION: 'X-Inertia-Version',
+        LOCATION: 'X-Inertia-Location'
+    },
+    handleVersionChange: vi.fn(() => new Response('', {
+        status: 409,
+        headers: { 'X-Inertia-Location': '/redirect-url' }
+    })),
+    handleEmptyResponse: vi.fn(() => new Response('', {
+        status: 302,
+        headers: { 'Location': '/' }
+    })),
+    shouldChangeRedirectStatus: vi.fn()
 }))
 
 describe('KoaAdapter', () => {

@@ -18,6 +18,28 @@ vi.mock('@inertianode/core', () => ({
             headers: { 'X-Inertia-Location': '/redirect-url' }
         }))
     },
+    InertiaResponseFactory: class MockInertiaResponseFactory {
+        render = vi.fn(() => ({
+            toResponse: vi.fn().mockResolvedValue(new Response('test response'))
+        }))
+        share = vi.fn()
+        setVersion = vi.fn()
+        getVersion = vi.fn()
+        setRootView = vi.fn()
+        setViteOptions = vi.fn()
+        setRenderer = vi.fn()
+        resolveUrlUsing = vi.fn()
+        setSsrOptions = vi.fn()
+        location = vi.fn(() => ({
+            status: 409,
+            headers: new globalThis.Headers({ 'X-Inertia-Location': '/redirect-url' }),
+            forEach: (fn: any) => {
+                fn('/redirect-url', 'X-Inertia-Location')
+            }
+        }))
+        clearHistory = vi.fn()
+        encryptHistory = vi.fn()
+    },
     Headers: {
         INERTIA: 'X-Inertia',
         VERSION: 'X-Inertia-Version',
