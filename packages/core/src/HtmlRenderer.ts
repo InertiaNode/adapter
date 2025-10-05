@@ -76,12 +76,41 @@ export function renderHtmlTemplate(page: Page, options: HtmlTemplateOptions = {}
 </html>`
 }
 
-export function renderInertiaHead(page: Page): string {
-    // This would typically render meta tags, title, etc.
-    return `<meta name="inertia-page" content="${JSON.stringify(page).replace(/"/g, '&quot;')}">`
+/**
+ * Render the Inertia head content from SSR response
+ * For non-SSR applications, head content is managed client-side via the <Head> component
+ * @param ssrHead - Optional SSR head content (array of strings or single string)
+ * @returns HTML string with head content, or empty string if no SSR head provided
+ */
+export function inertiaHead(ssrHead?: string[] | string | null): string {
+    if (!ssrHead) {
+        return '';
+    }
+
+    if (Array.isArray(ssrHead)) {
+        return ssrHead.join('\n    ');
+    }
+
+    return ssrHead;
 }
 
-export function renderInertiaBody(page: Page): string {
-    // This would typically render the app container
-    return `<div id="app" data-page="${JSON.stringify(page).replaceAll(/</g, '\\u003c').replaceAll(/"/g, '&quot;')}"></div>`
+/**
+ * Render the Inertia app mount point
+ * Includes the div with data-page attribute containing the serialized page data
+ * @param page - The Inertia page object
+ * @param ssrBody - Optional SSR body content (pre-rendered HTML)
+ * @param appId - The ID for the app div (default: 'app')
+ * @returns HTML string with the app div (or SSR body if provided)
+ */
+export function inertiaBody(page: Page, ssrBody?: string | null, appId: string = 'app'): string {
+    // If SSR body is provided, use it instead
+    if (ssrBody) {
+        return ssrBody;
+    }
+
+    const pageData = JSON.stringify(page)
+        .replaceAll(/</g, '\\u003c')
+        .replaceAll(/"/g, '&quot;');
+
+    return `<div id="${appId}" data-page='${pageData}'></div>`;
 }

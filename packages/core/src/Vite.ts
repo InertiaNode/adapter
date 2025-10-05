@@ -91,6 +91,23 @@ export class Vite {
     }
 
     /**
+     * Generate React Fast Refresh script tag for development
+     * Only needed if you want to manually add React refresh without using makeTag()
+     */
+    static reactRefresh(options?: Partial<ViteOptions>): string {
+        const hot = this.hotUrl(options) || 'http://localhost:5173';
+
+        return `
+    <script type="module">
+        import RefreshRuntime from '${hot}/@react-refresh'
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+    </script>`;
+    }
+
+    /**
      * Detect if React is being used in the project
      */
     private static detectReactUsage(viteOptions: ViteOptions, manifest: any): boolean {

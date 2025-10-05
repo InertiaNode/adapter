@@ -12,6 +12,11 @@ export interface Page {
   cache?: number[]
 }
 
+export interface SsrResponse {
+  head: string[]
+  body: string
+}
+
 export interface Props { }
 
 export type ViteOptions = {
