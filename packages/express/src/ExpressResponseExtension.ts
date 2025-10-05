@@ -1,6 +1,6 @@
 import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import type { InertiaResponse } from '@inertianode/core';
-import { Inertia, Headers, handleVersionChange, handleEmptyResponse, shouldChangeRedirectStatus } from '@inertianode/core';
+import { Inertia, InertiaResponseFactory, Headers, handleVersionChange, handleEmptyResponse, shouldChangeRedirectStatus } from '@inertianode/core';
 
 // Helper function to convert Express request to web Request
 function expressRequestToWebRequest(req: ExpressRequest): Request {
@@ -160,24 +160,49 @@ export class ExpressInertiaResponse {
 
 // Create the Inertia property that will be added to Express Response
 export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse) {
+    // Create a per-request Inertia instance
+    const inertiaInstance = new InertiaResponseFactory();
+
+    // Copy global configuration to the per-request instance
+    if (Inertia.getVersion()) {
+        inertiaInstance.setVersion(Inertia.getVersion());
+    }
+
+    // Copy other global settings
+    if ((Inertia as any).rootView) {
+        inertiaInstance.setRootView((Inertia as any).rootView);
+    }
+
+    if ((Inertia as any).viteOptions) {
+        inertiaInstance.setViteOptions((Inertia as any).viteOptions);
+    }
+
+    if ((Inertia as any).renderer) {
+        inertiaInstance.setRenderer((Inertia as any).renderer);
+    }
+
+    if ((Inertia as any).urlResolver) {
+        inertiaInstance.resolveUrlUsing((Inertia as any).urlResolver);
+    }
+
     return {
         /**
          * Render a component and automatically send the response
          */
         async render(component: string, props: Record<string, any> = {}): Promise<void> {
-            const inertiaResponse = Inertia.render(component, props);
+            const inertiaResponse = inertiaInstance.render(component, props);
             const expressInertiaResponse = new ExpressInertiaResponse(inertiaResponse, req);
             await expressInertiaResponse.toResponse(res);
         },
 
         /**
-         * Share data with all Inertia requests
+         * Share data with all Inertia requests (scoped to this request)
          */
         share(key: string | Record<string, any>, value?: any): void {
             if (typeof key === 'object') {
-                Inertia.share(key);
+                inertiaInstance.share(key);
             } else {
-                Inertia.share(key, value);
+                inertiaInstance.share(key, value);
             }
         },
 
@@ -185,35 +210,35 @@ export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse)
          * Set the version for asset versioning
          */
         setVersion(version: string | (() => string)): void {
-            Inertia.setVersion(version);
+            inertiaInstance.setVersion(version);
         },
 
         /**
          * Get the current version
          */
         getVersion(): string | undefined {
-            return Inertia.getVersion();
+            return inertiaInstance.getVersion();
         },
 
         /**
          * Set the root view name
          */
         setRootView(rootView: string): void {
-            Inertia.setRootView(rootView);
+            inertiaInstance.setRootView(rootView);
         },
 
         /**
          * Set Vite options for asset handling
          */
         setViteOptions(options: any): void {
-            Inertia.setViteOptions(options);
+            inertiaInstance.setViteOptions(options);
         },
 
         /**
          * Create a location response (for redirects)
          */
         location(url: string): void {
-            const locationResponse = Inertia.location(url);
+            const locationResponse = inertiaInstance.location(url);
             // Set the headers from the Inertia response if it exists
             if (locationResponse && locationResponse.headers) {
                 locationResponse.headers.forEach((value: string, key: string) => {
@@ -230,6 +255,20 @@ export function createInertiaProperty(req: ExpressRequest, res: ExpressResponse)
         back(fallbackUrl: string = '/'): void {
             const referer = req.get && req.get('Referer');
             res.redirect(303, referer || fallbackUrl);
+        },
+
+        /**
+         * Clear the history state
+         */
+        clearHistory(): void {
+            inertiaInstance.clearHistory();
+        },
+
+        /**
+         * Encrypt the history state
+         */
+        encryptHistory(encrypt: boolean = true): void {
+            inertiaInstance.encryptHistory(encrypt);
         }
     };
 }

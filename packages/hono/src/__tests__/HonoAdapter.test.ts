@@ -15,6 +15,15 @@ vi.mock('@inertianode/core', () => ({
         share: vi.fn(),
         setRootView: vi.fn()
     },
+    InertiaResponseFactory: vi.fn(() => ({
+        render: vi.fn(),
+        share: vi.fn(),
+        setVersion: vi.fn(),
+        getVersion: vi.fn(() => 'test-version'),
+        setRootView: vi.fn(),
+        setViteOptions: vi.fn(),
+        location: vi.fn(() => new Response('', { status: 409 }))
+    })),
     setupInertiaMiddleware: vi.fn(),
     handleVersionChange: vi.fn(() => new Response('Version changed', { status: 409 })),
     handleEmptyResponse: vi.fn(() => new Response('Empty response', { status: 409 })),

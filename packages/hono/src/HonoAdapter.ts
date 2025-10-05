@@ -1,9 +1,13 @@
 import type { Context, Next } from 'hono'
 import type { Page, InertiaMiddlewareOptions } from '@inertianode/core';
 import { Headers, Inertia, setupInertiaMiddleware, handleVersionChange, handleEmptyResponse, shouldChangeRedirectStatus } from '@inertianode/core';
+import { createInertiaProperty } from './HonoResponseExtension.js';
 
 export function inertiaHonoAdapter(options: InertiaMiddlewareOptions = {}) {
   return async (c: Context, next: Next) => {
+    // Create per-request Inertia instance
+    c.Inertia = createInertiaProperty(c);
+
     // Use normalized middleware setup
     setupInertiaMiddleware(options, () => resolveValidationErrors(c));
 
