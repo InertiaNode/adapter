@@ -278,11 +278,14 @@ export function createInertiaProperty(req: any, res: ExpressResponse) {
     };
 }
 
-// Extend Request type to include Inertia property
+// Extend Response type to include Inertia property
 declare global {
     namespace Express {
-        interface Request {
+        interface Response {
             Inertia: ReturnType<typeof createInertiaProperty>;
         }
     }
 }
+
+// Explicitly export to ensure type augmentation is loaded
+export {};

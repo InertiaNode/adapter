@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import type { Request } from 'express';
+import type { Response } from 'express';
 import type { createInertiaProperty } from './NestJSResponseExtension.js';
 
 /**
@@ -22,7 +22,7 @@ export type InertiaInstance = ReturnType<typeof createInertiaProperty>;
  */
 export const InertiaDecorator = createParamDecorator(
     (data: unknown, ctx: ExecutionContext): InertiaInstance => {
-        const request = ctx.switchToHttp().getRequest<Request>();
-        return (request as any).Inertia;
+        const response = ctx.switchToHttp().getResponse<Response>();
+        return response.Inertia;
     },
 );

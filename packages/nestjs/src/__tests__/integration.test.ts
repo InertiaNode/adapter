@@ -119,10 +119,10 @@ describe('NestJS Adapter Integration Tests', () => {
             expect(mockNext).toHaveBeenCalled()
 
             // Verify Inertia property exists
-            expect((mockRequest as any).Inertia).toBeDefined()
+            expect((mockResponse as any).Inertia).toBeDefined()
 
             // Simulate controller using Inertia
-            const inertia = (mockRequest as any).Inertia
+            const inertia = (mockResponse as any).Inertia
 
             // Share some data
             inertia.share('user', { id: 1, name: 'John' })
@@ -150,7 +150,7 @@ describe('NestJS Adapter Integration Tests', () => {
                 mockNext
             )
 
-            const inertia = (mockRequest as any).Inertia
+            const inertia = (mockResponse as any).Inertia
 
             // Share data in multiple calls
             inertia.share('auth', { user: { id: 1 } })
@@ -172,7 +172,7 @@ describe('NestJS Adapter Integration Tests', () => {
                 mockNext
             )
 
-            const inertia = (mockRequest as any).Inertia
+            const inertia = (mockResponse as any).Inertia
 
             // Trigger a location redirect
             inertia.location('/login')
@@ -196,7 +196,7 @@ describe('NestJS Adapter Integration Tests', () => {
                 mockNext
             )
 
-            const inertia = (mockRequest as any).Inertia
+            const inertia = (mockResponse as any).Inertia
 
             // Trigger back navigation
             inertia.back()
@@ -213,7 +213,7 @@ describe('NestJS Adapter Integration Tests', () => {
                 mockNext
             )
 
-            const inertia = (mockRequest as any).Inertia
+            const inertia = (mockResponse as any).Inertia
 
             // Set version
             inertia.setVersion('2.0.0')
@@ -237,7 +237,7 @@ describe('NestJS Adapter Integration Tests', () => {
 
             // Verify request data is preserved
             expect((mockRequest as any).user).toEqual({ id: 1, name: 'Test User' })
-            expect((mockRequest as any).Inertia).toBeDefined()
+            expect((mockResponse as any).Inertia).toBeDefined()
             expect(mockNext).toHaveBeenCalled()
         })
     })
@@ -252,7 +252,7 @@ describe('NestJS Adapter Integration Tests', () => {
                 mockNext
             )
 
-            const inertia = (mockRequest as any).Inertia
+            const inertia = (mockResponse as any).Inertia
 
             // Test that the render method exists and can be called successfully
             expect(typeof inertia.render).toBe('function')

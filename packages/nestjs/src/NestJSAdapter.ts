@@ -13,8 +13,8 @@ export class InertiaNestJSMiddleware implements NestMiddleware {
     }
 
     use(req: Request, res: Response, next: NextFunction) {
-        // Add Inertia property to request object
-        (req as any).Inertia = createInertiaProperty(req, res);
+        // Add Inertia property to response object
+        (res as any).Inertia = createInertiaProperty(req, res);
 
         // Use normalized middleware setup
         setupInertiaMiddleware(this.options, () => resolveValidationErrors(req));
@@ -32,8 +32,8 @@ export function createInertiaMiddleware(options: InertiaMiddlewareOptions = {}) 
     @Injectable()
     class ConfiguredInertiaNestJSMiddleware implements NestMiddleware {
         use(req: Request, res: Response, next: NextFunction) {
-            // Add Inertia property to request object
-            (req as any).Inertia = createInertiaProperty(req, res);
+            // Add Inertia property to response object
+            (res as any).Inertia = createInertiaProperty(req, res);
 
             // Use normalized middleware setup
             setupInertiaMiddleware(options, () => resolveValidationErrors(req));
@@ -51,8 +51,8 @@ export function createInertiaMiddleware(options: InertiaMiddlewareOptions = {}) 
  */
 export function inertiaNestJSAdapter(options: InertiaMiddlewareOptions = {}) {
     return (req: Request, res: Response, next: NextFunction) => {
-        // Add Inertia property to request object
-        (req as any).Inertia = createInertiaProperty(req, res);
+        // Add Inertia property to response object
+        (res as any).Inertia = createInertiaProperty(req, res);
 
         // Use normalized middleware setup
         setupInertiaMiddleware(options, () => resolveValidationErrors(req));

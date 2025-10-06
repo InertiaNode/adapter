@@ -105,7 +105,7 @@ describe('NestJSAdapter', () => {
             expect(typeof middleware.use).toBe('function')
         })
 
-        it('should add Inertia property to request object', () => {
+        it('should add Inertia property to response object', () => {
             const middleware = new InertiaNestJSMiddleware()
 
             middleware.use(
@@ -114,14 +114,14 @@ describe('NestJSAdapter', () => {
                 mockNext
             )
 
-            expect((mockRequest as any).Inertia).toBeDefined()
-            expect(typeof (mockRequest as any).Inertia.render).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.share).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.setVersion).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.getVersion).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.setRootView).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.setViteOptions).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.location).toBe('function')
+            expect((mockResponse as any).Inertia).toBeDefined()
+            expect(typeof (mockResponse as any).Inertia.render).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.share).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.setVersion).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.getVersion).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.setRootView).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.setViteOptions).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.location).toBe('function')
         })
 
         it('should call setupInertiaMiddleware with options', () => {
@@ -178,7 +178,7 @@ describe('NestJSAdapter', () => {
             expect(middleware.length).toBe(3) // req, res, next parameters
         })
 
-        it('should add Inertia property to request object', () => {
+        it('should add Inertia property to response object', () => {
             const middleware = inertiaNestJSAdapter()
 
             middleware(
@@ -187,14 +187,14 @@ describe('NestJSAdapter', () => {
                 mockNext
             )
 
-            expect((mockRequest as any).Inertia).toBeDefined()
-            expect(typeof (mockRequest as any).Inertia.render).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.share).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.setVersion).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.getVersion).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.setRootView).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.setViteOptions).toBe('function')
-            expect(typeof (mockRequest as any).Inertia.location).toBe('function')
+            expect((mockResponse as any).Inertia).toBeDefined()
+            expect(typeof (mockResponse as any).Inertia.render).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.share).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.setVersion).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.getVersion).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.setRootView).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.setViteOptions).toBe('function')
+            expect(typeof (mockResponse as any).Inertia.location).toBe('function')
         })
 
         it('should call setupInertiaMiddleware with options', () => {
