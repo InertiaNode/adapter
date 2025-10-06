@@ -39,6 +39,21 @@ function setExpressHeaders(webResponse: Response, expressResponse: ExpressRespon
     });
 }
 
+// Define the callable Inertia interface
+export interface Inertia {
+    (component: string, props?: Record<string, any>): Promise<void>;
+    render(component: string, props?: Record<string, any>): Promise<void>;
+    share(key: string | Record<string, any>, value?: any): void;
+    setVersion(version: string | (() => string)): void;
+    getVersion(): string | undefined;
+    setRootView(rootView: string): void;
+    setViteOptions(options: any): void;
+    location(url: string): void;
+    back(fallbackUrl?: string): void;
+    clearHistory(): void;
+    encryptHistory(encrypt?: boolean): void;
+}
+
 // Extend InertiaResponse with NestJS-specific methods
 export class NestJSInertiaResponse {
     private inertiaResponse: InertiaResponse;
@@ -159,7 +174,7 @@ export class NestJSInertiaResponse {
 }
 
 // Create the Inertia property that will be added to NestJS Request
-export function createInertiaProperty(req: any, res: ExpressResponse) {
+export function createInertiaProperty(req: any, res: ExpressResponse): Inertia {
     // Create a per-request Inertia instance
     const inertiaInstance = new InertiaResponseFactory();
 
@@ -190,15 +205,19 @@ export function createInertiaProperty(req: any, res: ExpressResponse) {
         inertiaInstance.setSsrOptions((Inertia as any).ssrOptions);
     }
 
-    return {
+    // Create the render function
+    const renderFn = async (component: string, props: Record<string, any> = {}): Promise<void> => {
+        const inertiaResponse = inertiaInstance.render(component, props);
+        const nestJSInertiaResponse = new NestJSInertiaResponse(inertiaResponse, req);
+        await nestJSInertiaResponse.toResponse(res);
+    };
+
+    // Create the methods object
+    const methods = {
         /**
          * Render a component and automatically send the response
          */
-        async render(component: string, props: Record<string, any> = {}): Promise<void> {
-            const inertiaResponse = inertiaInstance.render(component, props);
-            const nestJSInertiaResponse = new NestJSInertiaResponse(inertiaResponse, req);
-            await nestJSInertiaResponse.toResponse(res);
-        },
+        render: renderFn,
 
         /**
          * Share data with all Inertia requests (scoped to this request)
@@ -276,13 +295,17 @@ export function createInertiaProperty(req: any, res: ExpressResponse) {
             inertiaInstance.encryptHistory(encrypt);
         }
     };
+
+    // Make the render function callable while also having methods
+    // This allows both res.Inertia('Component', {}) and res.Inertia.render('Component', {})
+    return Object.assign(renderFn, methods) as Inertia;
 }
 
 // Extend Response type to include Inertia property
 declare global {
     namespace Express {
         interface Response {
-            Inertia: ReturnType<typeof createInertiaProperty>;
+            Inertia: Inertia;
         }
     }
 }

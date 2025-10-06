@@ -1,11 +1,12 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { Response } from 'express';
-import type { createInertiaProperty } from './NestJSResponseExtension.js';
+import type { Inertia } from './NestJSResponseExtension.js';
 
 /**
  * Type for the Inertia instance that gets injected into controllers
+ * Can be called directly or accessed via methods
  */
-export type InertiaInstance = ReturnType<typeof createInertiaProperty>;
+export type InertiaInstance = Inertia;
 
 /**
  * Parameter decorator to inject the Inertia instance into a controller method
