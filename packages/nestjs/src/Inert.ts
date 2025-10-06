@@ -13,15 +13,15 @@ export type InertiaInstance = Inertia;
  *
  * @example
  * ```typescript
- * import { InertiaDecorator, type InertiaInstance } from '@inertianode/nestjs';
+ * import { Inert, type InertiaInstance } from '@inertianode/nestjs';
  *
  * @Get('/users')
- * async getUsers(@InertiaDecorator() inertia: InertiaInstance) {
+ * async getUsers(@Inert() inertia: InertiaInstance) {
  *   await inertia.render('Users/Index', { users: [] });
  * }
  * ```
  */
-export const InertiaDecorator = createParamDecorator(
+export const Inert = createParamDecorator(
     (data: unknown, ctx: ExecutionContext): InertiaInstance => {
         const response = ctx.switchToHttp().getResponse<Response>();
         return response.Inertia;

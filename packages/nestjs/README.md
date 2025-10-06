@@ -87,12 +87,12 @@ export class AppModule implements NestModule {
 ```typescript
 // users.controller.ts
 import { Controller, Get } from '@nestjs/common';
-import { InertiaDecorator, type InertiaInstance } from '@inertianode/nestjs';
+import { Inert, type InertiaInstance } from '@inertianode/nestjs';
 
 @Controller('users')
 export class UsersController {
   @Get()
-  async index(@InertiaDecorator() inertia: InertiaInstance) {
+  async index(@Inert() inertia: InertiaInstance) {
     const users = await this.usersService.findAll();
     await inertia.render('Users/Index', { users });
   }
@@ -100,7 +100,7 @@ export class UsersController {
   @Get(':id')
   async show(
     @Param('id') id: string,
-    @InertiaDecorator() inertia: InertiaInstance
+    @Inert() inertia: InertiaInstance
   ) {
     const user = await this.usersService.findOne(id);
     await inertia.render('Users/Show', { user });
@@ -313,7 +313,7 @@ export class DashboardController {
   constructor(private readonly statsService: StatsService) {}
 
   @Get()
-  async index(@InertiaDecorator() inertia: InertiaInstance) {
+  async index(@Inert() inertia: InertiaInstance) {
     const stats = await this.statsService.getStats();
 
     inertia.share({
@@ -336,7 +336,7 @@ export class UsersController {
   @Post()
   async store(
     @Body() createUserDto: CreateUserDto,
-    @InertiaDecorator() inertia: InertiaInstance
+    @Inert() inertia: InertiaInstance
   ) {
     try {
       const user = await this.usersService.create(createUserDto);
